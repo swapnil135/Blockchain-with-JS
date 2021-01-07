@@ -1,7 +1,14 @@
 const Blockchain = require('./Blockchain');
 const bitcoin = new Blockchain();
 
-bitcoin.createNeBlock(1,'123dsf132f','123f44f4');
-bitcoin.createNeBlock(34,'123dasaASDf132f','123f4ASDAE4f4');
-bitcoin.createNeBlock(13,'123dsf13SFQR','12WERG344f4');
-console.log(bitcoin);
+const previousBlockHash='H123JBI412H144J2K';
+const currentBlockData=[
+  {
+    amount:10,
+    sender:'ASD1844BSD',
+    recipient:'123SDFASD'
+  }
+]
+const nonce=bitcoin.proofOfWork(previousBlockHash,currentBlockData);
+console.log(nonce);
+console.log(bitcoin.hashBlock(previousBlockHash,currentBlockData,nonce));
