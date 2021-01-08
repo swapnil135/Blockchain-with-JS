@@ -1,9 +1,15 @@
 const sha256 = require('sha256');
+// Creates a unique random string to be used for the address of this instance of the api
+const uuid = require('uuid').v4;
+// Retrieveing the url of the network_node through the argument passed
+const currentNodeUrl =process.argv[3];
 function Blockchain()
 {
   // This is the chain of blocks
   this.chain=[];
   this.pendingTransactions=[];
+  this.currentNodeUrl=currentNodeUrl;
+  this.networkNodes =[];
   // This is the genesis block or the starting of the blockchain
   this.createNewBlock(100,'0','0');
 }
@@ -35,9 +41,16 @@ Blockchain.prototype.createNewTransaction=function(amount,sender,recepeint)
   const newTransaction={
     amount:amount,
     sender: sender,
-    recipient:recepeint
+    recipient:recepeint,
+    transactionId: uuid().split('-').join('');
   }
-  // push the newly created transaction in the pendingTransactions array
+
+  return newTransaction;
+}
+
+Blockchain.prototype.addTransactionToPendingTransaction= function(transaction)
+{
+  // push the newly transaction in the pendingTransactions array
   // All the transactions in this pendinfTransactions array are not validated, that happens when a new black is created
   this.pendingTransactions.push(newTransaction);
 
