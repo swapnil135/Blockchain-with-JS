@@ -201,6 +201,46 @@ app.post('/register-nodes-bulk', function(req, res) {
 
 });
 
+app.get('/consensus', function(req,res)
+{
+  const requestPromises = [];
+  // we make a request to every other node in our blockchain to get their chain and compare it whith our own
+  bitcoin.networkNodes.forEach(networkNodeUrl =>
+  {
+    const requestOptions=
+    {
+      uri : networkNodeUrl +'/blockchain',
+      method : 'get',
+      json :true;
+    }
+    requestPromises.push(rp(requestOptions));
+  });
+  Promise.all(requestPromises)
+  .then(blockChains=>   //this data will be an array of blockchains
+  {
+    const chainIsReplaced=false;
+    blockChains.forEach(blockchain=>
+    {
+      if(blockchain.chain.length>bitcoin.chain.length && bitcoin.chainIsValid(blockchain.chain))
+      {
+        bitcoin.chain=blockchain.chain;
+        bitcoin.pendingTransactions=blockchain.pendingTransactions; //if we find a chain of greater length, we replace this chain.
+        chainIsReplaced=true;
+      };
+    });
+    if(chainIsReplaced) res.json(
+      {
+        note:"chain is replaced",
+        chain: bitcoin.chain
+      })
+      else res.json(
+        {
+          note:"chain is not replaced",
+          chain: bitcoin.chain
+        });
+  });
+});
+
 // Adding the function parameter so we know that the api is working
 app.listen(port, function() {
   console.log('listening on port ' + port);
