@@ -42,7 +42,7 @@ Blockchain.prototype.createNewTransaction=function(amount,sender,recepeint)
     amount:amount,
     sender: sender,
     recipient:recepeint,
-    transactionId: uuid().split('-').join('');
+    transactionId: uuid().split('-').join('')
   }
 
   return newTransaction;
@@ -52,7 +52,7 @@ Blockchain.prototype.addTransactionToPendingTransaction= function(transaction)
 {
   // push the newly transaction in the pendingTransactions array
   // All the transactions in this pendinfTransactions array are not validated, that happens when a new black is created
-  this.pendingTransactions.push(newTransaction);
+  this.pendingTransactions.push(transaction);
 
   // Return the index of the block of which this transaction will be part of
   return this.getLastBlock()['index']+1;
