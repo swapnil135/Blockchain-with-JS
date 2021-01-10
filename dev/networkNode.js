@@ -200,7 +200,7 @@ app.post('/register-nodes-bulk', function(req, res) {
 
 
 });
-
+// this endpoint checks if the node matches with the longest chain in the other nodes and corrects it if it does not
 app.get('/consensus', function(req,res)
 {
   const requestPromises = [];
@@ -211,14 +211,14 @@ app.get('/consensus', function(req,res)
     {
       uri : networkNodeUrl +'/blockchain',
       method : 'get',
-      json :true;
+      json :true
     }
     requestPromises.push(rp(requestOptions));
   });
   Promise.all(requestPromises)
   .then(blockChains=>   //this data will be an array of blockchains
   {
-    const chainIsReplaced=false;
+    let chainIsReplaced=false;
     blockChains.forEach(blockchain=>
     {
       if(blockchain.chain.length>bitcoin.chain.length && bitcoin.chainIsValid(blockchain.chain))
@@ -240,6 +240,29 @@ app.get('/consensus', function(req,res)
         });
   });
 });
+//we hit this endpoint to retrieve the block with the given hash
+app.get('/block/:blockHash', function(req,res) // example query => localhost:3001/block/ASD809ADS
+{
+  //if there is a colon in front of any value in the address it is stored in req.body
+  const blockHash=req.params.blockHash;
+  const correctBlock=bitcoin.getBlock(blockHash);
+  res.json({
+    block:correctBlock
+  });
+});
+//get the transaction with the given transaction id.
+app.get('/transaction/:transactionId',function(req,res){
+  const transactionId=req.params.transactionId;
+  res.json(bitcoin.getTransaction(transactionId));
+});
+//get all the transaction linked to the specific  and that address's balance.
+app.get('/address/:address', function(req,res){
+  const address=req.params.address;
+  const addressData=bitcoin.getAddressData(address);
+  res.json(addressData);
+});
+
+
 
 // Adding the function parameter so we know that the api is working
 app.listen(port, function() {
